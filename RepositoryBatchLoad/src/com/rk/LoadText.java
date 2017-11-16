@@ -46,7 +46,7 @@ public class LoadText {
         	List<String> lines = FileUtils.readLines(file, "UTF-8");
         	int i = 0;
         	boolean processFlag = false;
-        	DBSessionUtil.getInstance().getSession();
+        	
         	ArrayList<MCR_Bean> beanList = new ArrayList<MCR_Bean>();
         	int j = 1;
             for (String line : lines) {
@@ -64,9 +64,9 @@ public class LoadText {
                         	ArrayList<MCR_Bean> list = new ArrayList<MCR_Bean>();
                         	list.addAll(beanList);
                         	System.out.println("while calling thread .."+j);
-                        //	if(j!=2) {
-                        		new ProcessDBThread(list, j+"").start();
-                        	//}
+                       
+                        	new ProcessDBThread(list, j+"").start();
+                        	
                         	beanList = new ArrayList<MCR_Bean>();
                         	j++;
                         }
