@@ -38,6 +38,68 @@ collection.find(condition);
 //if output came write result ot excel and make download
 
 
+----------------------------------
+app.directive('selectFile', ['$parse','uploadFile','daismvw', function ($parse,uploadFile,daismvw,$scope,$mdDialog) {
+            return {
+               restrict: 'A',
+               link: function($scope, element, attrs) {
+                  var model = $parse(attrs.selectFile);
+                  var modelSetter = model.assign;
+                  element.bind('change', function(){
+                	 
+                     $scope.$apply(function(){
+                    	 
+                    	 modelSetter($scope, element[0].files[0]);
+                    	 var file = element[0].files[0];
+                    	 if(file != null){
+                    		                   		
+                    		 uploadFile.uploadFileToUrl(file, $scope, daismvw);
+                    	 }else{
+                    		 $scope.returnMessage = "Please Select File";
+                 		     $scope.showAlert(event);
+                 		     console.log("File Object is null:Please select File");
+                    	 }
+                        
+                     });
+                     
+                  });
+               }
+            };
+    }]); 
+
+	app.service('uploadFile', ['$http','daismvw', function ($http,$scope,$rootScope,$mdDialog,daismvw) {
+		
+	 
+		 this.uploadFileToUrl = function(file, $scope,daismvw){
+			var uploadData = {"fileSystemId":"temporaryFileSystem1"};
+			var frameworkcontext = daismvw.getNewFrameworkContext();
+			daismvw.upload(frameworkcontext, uploadData, file).then(function (result) {
+				var context = FrameworkContext;
+				context = result.header;
+					if(context.returnStatus.returnCode == "99999"){
+						$scope.returnMessage = context.returnStatus.messageList[0].message;
+						$scope.showAlert(event);
+				  
+					}else{
+	        	 
+						if(result["fileRepository"] != null){
+							fileId  = (result["fileRepository"])["fileId"];
+							$scope.fileID = (result["fileRepository"])["fileId"];
+							$scope.loadData((result["fileRepository"])["fileId"]);
+							angular.element("input[type='file']").val(null);
+						}else{
+							$scope.returnMessage = "Error while Import data [File upload failed]";
+							$scope.showAlert(event);
+							angular.element("input[type='file']").val(null);
+						}
+ 					
+					}
+	    });
+		 }; 
+	}]);
+
+
+
 
 //Mongo Export java code
 
